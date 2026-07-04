@@ -1,0 +1,25 @@
+{
+    "app": {
+        "name": "YTIMP4",
+        "version": "1.0.0",
+        "debug": true,
+        "host": "127.0.0.1",
+        "port": 5000,
+        "auto_open_browser": true
+    },
+    "downloads": {
+        "video_path": "downloads/",
+        "archive_path": "archives/",
+        "max_concurrent_downloads": 3,
+        "default_quality": "best"
+    },
+    "youtube": {
+        "api_key": "",
+        "use_invidious": true,
+        "invidious_instance": "https://invidious.fdn.fr"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "ytimp4.log"
+    }
+}

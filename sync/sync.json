@@ -1,0 +1,57 @@
+{
+    "version": "1.0.0",
+    "last_scan": "2026-06-11T00:00:00",
+    "project_root": ".",
+    "structure": {
+        "root_files": [
+            "bootstrap.py",
+            "ytimp4.py",
+            "config.json",
+            "requirements.txt"
+        ],
+        "folders": {
+            "servers": {
+                "path": "servers",
+                "files": ["__init__.py", "channel_lookup.py", "channel_processor.py"]
+            },
+            "templates": {
+                "path": "templates",
+                "files": ["index.html"]
+            },
+            "icons": {
+                "path": ".icons",
+                "files": ["downloader.svg", "instructions.svg", "refresh.svg", "trash.svg", "channel.svg", "archive.svg"]
+            },
+            "sync": {
+                "path": "sync",
+                "files": ["sync.json", "sync_manager.py"]
+            },
+            "downloads": {
+                "path": "downloads",
+                "description": "Stores downloaded videos"
+            },
+            "archives": {
+                "path": "archives",
+                "description": "Stores archived channel data"
+            }
+        }
+    },
+    "dependencies": {
+        "requirements_file": "requirements.txt",
+        "python_version": ">=3.8"
+    },
+    "scripts": {
+        "start": "start.bat",
+        "bootstrap": "bootstrap.py",
+        "main": "ytimp4.py"
+    },
+    "ports": {
+        "default": 8080,
+        "range_start": 8080,
+        "range_end": 8090
+    },
+    "icons": {
+        "source": "https://icons8.com/icons/set/youtube-svg",
+        "list": ["downloader.svg", "instructions.svg", "refresh.svg", "trash.svg", "channel.svg", "archive.svg"]
+    }
+}
