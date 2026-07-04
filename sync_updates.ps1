@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
-$ProjectRoot = "C:\Users\astra\Desktop\YTIMP4"
+$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$BackupFolder = "C:\Users\astra\Desktop\YTIMP4_backup_$Timestamp"
+$BackupFolder = Join-Path $env:USERPROFILE "YTIMP4_backup_$Timestamp"
 
 Write-Host ""
 Write-Host "YTIMP4 - Sync & Save"
