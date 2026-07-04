@@ -1,5 +1,5 @@
 flask>=2.0.0
-yt-dlp>=2023.0.0
+yt-dlp>=2023.12.30
 requests>=2.25.0
 beautifulsoup4>=4.9.0
 aiohttp>=3.8.0
