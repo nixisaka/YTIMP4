@@ -1520,10 +1520,9 @@ def download():
     return '', 202
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--port', type=int, default=8080)
-    parser.add_argument('--debug', action='store_true', default=False)
-    args = parser.parse_args()
-    
-    app = YTIMP4App()
-    app.run(port=args.port, debug=args.debug)
+    if os.path.exists(COOKIE_FILE):
+        os.remove(COOKIE_FILE)
+    print(f"\nYTIMP4 - CPU cores: {cpu_count}, Deno: {check_deno()}, FFmpeg: {check_ffmpeg()}")
+    print(f"Archive folder: {ARCHIVE_FOLDER}")
+    port = 8080
+    app.run(host='127.0.0.1', port=port, debug=False, threaded=True)
