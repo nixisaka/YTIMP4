@@ -39,6 +39,10 @@
         .action-btn:hover { background-color: #1f1f1f; border-color: #ff0000; }
         .action-btn.danger { border-color: #4a1a1a; }
         .action-btn.danger:hover { background-color: #2a0a0a; border-color: #ff0000; }
+        .action-btn.save-btn { background: #cc0000; border-color: #cc0000; color: white; }
+        .action-btn.save-btn:hover { background: #ff0000; border-color: #ff0000; }
+        .action-btn.reset-btn { background: #3a3a3a; border-color: #3a3a3a; color: white; }
+        .action-btn.reset-btn:hover { background: #4a4a4a; border-color: #4a4a4a; }
         
         .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; min-height: calc(100vh - 60px); }
         .sidebar { width: 240px; background-color: #0a0a0a; padding: 1rem 0.75rem; border-right: 1px solid #1f1f1f; }
@@ -75,7 +79,7 @@
         .recent-status.downloading { background: #1a2a3a; color: #ffaa00; }
         
         .quick-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
-        .quick-btn { padding: 0.6rem 1.25rem; background: #121212; border: 1px solid #2a2a2a; border-radius: 40px; cursor: pointer; transition: all 0.2s; }
+        .quick-btn { padding: 0.6rem 1.25rem; background: #121212; border: 1px solid #2a2a2a; border-radius: 40px; cursor: pointer; transition: all 0.2s; color: #ffffff; }
         .quick-btn:hover { background: #1f1f1f; border-color: #ff0000; }
         
         .status-card { background: #0f0f0f; border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; border: 1px solid #1f1f1f; }
@@ -135,7 +139,7 @@
         .lang-code { font-weight: 600; min-width: 40px; }
         .lang-name { flex: 1; }
         
-        .theme-toggle { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: #1f1f1f; border: 1px solid #2a2a2a; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; transition: all 0.3s; }
+        .theme-toggle { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: #1f1f1f; border: 1px solid #2a2a2a; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; transition: all 0.3s; font-size: 1.2rem; }
         .theme-toggle:hover { transform: scale(1.1); border-color: #ff0000; }
         
         .settings-section { background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
@@ -146,6 +150,10 @@
         .settings-input, .settings-select { flex: 1; min-width: 200px; padding: 0.5rem 1rem; background-color: #121212; border: 1px solid #3a3a3a; border-radius: 8px; color: #ffffff; font-size: 0.9rem; outline: none; }
         .settings-input:focus, .settings-select:focus { border-color: #ff0000; }
         .settings-hint { width: 100%; margin-left: 160px; font-size: 0.7rem; color: #777777; margin-top: 0.25rem; }
+        .settings-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.5rem; }
+        .settings-status { margin-top: 1rem; padding: 0.75rem; border-radius: 8px; text-align: center; display: none; }
+        .settings-status.success { display: block; background-color: #1a3a1a; color: #10b981; border: 1px solid #2a5a2a; }
+        .settings-status.error { display: block; background-color: #3a1a1a; color: #ff8888; border: 1px solid #5a2a2a; }
         
         .step-card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; display: flex; gap: 1rem; }
         .step-number { width: 28px; height: 28px; background: #ff0000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
@@ -158,6 +166,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .features { display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #1f1f1f; font-size: 0.7rem; color: #777777; flex-wrap: wrap; }
+        .loading-suggestion { text-align: center; padding: 2rem; color: #aaaaaa; }
         
         @media (max-width: 768px) {
             .header-content { flex-direction: column; gap: 0.75rem; }
@@ -169,6 +178,8 @@
             .settings-label { width: 100%; }
             .settings-hint { margin-left: 0; }
             .thumbnail { width: 100%; }
+            .settings-actions { flex-direction: column; }
+            .settings-actions .action-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -195,23 +206,23 @@
     <div class="main-wrapper">
         <div class="sidebar">
             <div class="nav-item active" data-page="home">
-                <span class="nav-icon"><img src="/.icons/home.svg" alt="Home" onerror="this.src='/.static/fallback.png'"></span>
+                <span class="nav-icon"><img src="/static/icons/home.svg" alt="Home" onerror="this.src='/static/fallback.png'"></span>
                 <span>Home</span>
             </div>
             <div class="nav-item" data-page="downloader">
-                <span class="nav-icon"><img src="/.icons/download.svg" alt="Downloader" onerror="this.src='/.static/fallback.png'"></span>
+                <span class="nav-icon"><img src="/static/icons/downloader.svg" alt="Downloader" onerror="this.src='/static/fallback.png'"></span>
                 <span>Downloader</span>
             </div>
             <div class="nav-item" data-page="channel">
-                <span class="nav-icon"><img src="/.icons/channel.svg" alt="Channel Lookup" onerror="this.src='/.static/fallback.png'"></span>
+                <span class="nav-icon"><img src="/static/icons/channel.svg" alt="Channel Lookup" onerror="this.src='/static/fallback.png'"></span>
                 <span>Channel Lookup</span>
             </div>
             <div class="nav-item" data-page="settings">
-                <span class="nav-icon"><img src="/.icons/settings.svg" alt="Settings" onerror="this.src='/.static/fallback.png'"></span>
+                <span class="nav-icon"><img src="/static/icons/settings.svg" alt="Settings" onerror="this.src='/static/fallback.png'"></span>
                 <span>Settings</span>
             </div>
             <div class="nav-item" data-page="instructions">
-                <span class="nav-icon"><img src="/.icons/instructions.svg" alt="Instructions" onerror="this.src='/.static/fallback.png'"></span>
+                <span class="nav-icon"><img src="/static/icons/instructions.svg" alt="Instructions" onerror="this.src='/static/fallback.png'"></span>
                 <span>Instructions</span>
             </div>
         </div>

@@ -100,8 +100,11 @@ os.environ['PIP_NO_CACHE_DIR'] = '1'
 os.environ['PIP_DISABLE_PIP_VERSION_CHECK'] = '1'
 
 if platform.system() == "Windows":
-    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except:
+        pass
 else:
     locale.setlocale(locale.LC_ALL, 'C.UTF-8')
 
