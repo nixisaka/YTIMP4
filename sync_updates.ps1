@@ -3,36 +3,39 @@ $ErrorActionPreference = "Stop"
 function Show-Menu {
     Clear-Host
     Write-Host ""
-    Write-Host "  ██     ██ ████████████ ██████ ███     ███ █████████     █████                 ██████████  ██████     ██████   ██         ████████     ██████   ██    ██ " -ForegroundColor Red
-    Write-Host "  ██   ██      ██      ██  █████   █████ ██     ██   ██ ██                     ██     ██   ██   ██   ██   ██  ██         ██    ██   ██   ██   ██  ██  " -ForegroundColor Red
-    Write-Host "   ██ ██       ██      ██  ██ ██ ██ ██ ██ ██     ██  ██  ██                     ██    ██     ██ ██     ██ ██         ██    ██  ██     ██   ██ ██   " -ForegroundColor Red
-    Write-Host "    ████        ██      ██  ██  ████  ██ █████████  ██   ██      ██████        ██    ██     ██ ██     ██ ██         ████████   ██     ██    ███    " -ForegroundColor Red
-    Write-Host "     ██         ██      ██  ██   ██   ██ ██         █████████                   ██    ██     ██ ██     ██ ██         ██     ██ ██     ██   ██ ██   " -ForegroundColor Red
-    Write-Host "     ██         ██      ██  ██       ██ ██              ██                     ██     ██   ██   ██   ██  ██         ██     ██  ██   ██   ██  ██  " -ForegroundColor Red
-    Write-Host "     ██         ██    ██████ ██       ██ ██              ██                     ██      ██████     ██████   ██████████ █████████    ██████   ██    ██ " -ForegroundColor Red
+    Write-Host "  ██████  ███████ ███    ███  ██████   " -ForegroundColor Red
+    Write-Host "  ██   ██ ██      ████  ████ ██    ██  " -ForegroundColor White
+    Write-Host "  ██████  █████   ██ ████ ██ ██    ██  " -ForegroundColor Red
+    Write-Host "  ██   ██ ██      ██  ██  ██ ██    ██  " -ForegroundColor White
+    Write-Host "  ██   ██ ███████ ██      ██  ██████   " -ForegroundColor Red
     Write-Host ""
-    Write-Host "                                     YTIMP4 - Sync Toolbox" -ForegroundColor Cyan
+    Write-Host "  YTIMP4 - TOOLBOX (REMO)" -ForegroundColor Red
+    Write-Host "  YouTube Downloader & Manager" -ForegroundColor White
+    Write-Host "  Developer: Livia" -ForegroundColor Gray
+    Write-Host "  Contributors: FILipKOS, Lexxenaii" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "================================================================================" -ForegroundColor Gray
+    Write-Host "  GitHub: https://github.com/nixisaka/YTIMP4" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "  1. Sync Git Repository (Pull & Push)"
-    Write-Host "  2. Install/Update Dependencies"
-    Write-Host "  3. Run Application (ytimp4.py)"
-    Write-Host "  4. Run Bootstrap Setup"
-    Write-Host "  5. Check Status (Git & Files)"
-    Write-Host "  6. Fix Common Issues"
-    Write-Host "  7. Backup Project"
-    Write-Host "  8. Clean Cache & Temp Files"
-    Write-Host "  9. Open in Explorer"
-    Write-Host "  10. Exit"
+    Write-Host "================================================================================" -ForegroundColor DarkGray
     Write-Host ""
-    Write-Host "================================================================================" -ForegroundColor Gray
+    Write-Host "  1. Sync Git Repository" -ForegroundColor White
+    Write-Host "  2. Install Dependencies" -ForegroundColor White
+    Write-Host "  3. Start Application" -ForegroundColor White
+    Write-Host "  4. Run Bootstrap" -ForegroundColor White
+    Write-Host "  5. Check Status" -ForegroundColor White
+    Write-Host "  6. Repair Issues" -ForegroundColor White
+    Write-Host "  7. Backup Project" -ForegroundColor White
+    Write-Host "  8. Clear Cache" -ForegroundColor White
+    Write-Host "  9. Open Explorer" -ForegroundColor White
+    Write-Host "  10. Exit" -ForegroundColor White
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor DarkGray
     Write-Host ""
 }
 
 function Sync-Git {
     Write-Host ""
-    Write-Host "  [*] Syncing Git Repository..." -ForegroundColor Cyan
+    Write-Host "  [*] Syncing Git Repository..." -ForegroundColor Red
     Write-Host ""
     
     $branch = git branch --show-current
@@ -74,7 +77,7 @@ function Sync-Git {
 
 function Install-Dependencies {
     Write-Host ""
-    Write-Host "  [*] Installing Dependencies..." -ForegroundColor Cyan
+    Write-Host "  [*] Installing Dependencies..." -ForegroundColor Red
     Write-Host ""
     
     $requirements = @(
@@ -100,9 +103,9 @@ function Install-Dependencies {
     Read-Host "`nPress Enter to continue"
 }
 
-function Run-Application {
+function Start-Application {
     Write-Host ""
-    Write-Host "  [*] Starting YTIMP4..." -ForegroundColor Cyan
+    Write-Host "  [*] Starting YTIMP4..." -ForegroundColor Red
     Write-Host ""
     
     if (Test-Path "ytimp4.py") {
@@ -118,9 +121,9 @@ function Run-Application {
     Read-Host "`nPress Enter to continue"
 }
 
-function Run-Bootstrap {
+function Start-Bootstrap {
     Write-Host ""
-    Write-Host "  [*] Running Bootstrap Setup..." -ForegroundColor Cyan
+    Write-Host "  [*] Running Bootstrap Setup..." -ForegroundColor Red
     Write-Host ""
     
     if (Test-Path "bootstrap.py") {
@@ -135,9 +138,9 @@ function Run-Bootstrap {
     Read-Host "`nPress Enter to continue"
 }
 
-function Check-Status {
+function Get-Status {
     Write-Host ""
-    Write-Host "  [*] Checking Status..." -ForegroundColor Cyan
+    Write-Host "  [*] Checking Status..." -ForegroundColor Red
     Write-Host ""
     
     $files = @(
@@ -149,7 +152,7 @@ function Check-Status {
         "sync_updates.ps1"
     )
     
-    Write-Host "      Project Files:" -ForegroundColor Yellow
+    Write-Host "      Project Files:" -ForegroundColor White
     foreach ($file in $files) {
         if (Test-Path $file) {
             Write-Host "        $file [OK]" -ForegroundColor Green
@@ -159,7 +162,7 @@ function Check-Status {
     }
     
     Write-Host ""
-    Write-Host "      Folders:" -ForegroundColor Yellow
+    Write-Host "      Folders:" -ForegroundColor White
     $folders = @("downloads", "archives", "static/icons", "templates", "servers", "sync", "debugging", "setup")
     foreach ($folder in $folders) {
         if (Test-Path $folder) {
@@ -180,9 +183,9 @@ function Check-Status {
     Read-Host "`nPress Enter to continue"
 }
 
-function Fix-CommonIssues {
+function Repair-CommonIssues {
     Write-Host ""
-    Write-Host "  [*] Fixing Common Issues..." -ForegroundColor Cyan
+    Write-Host "  [*] Fixing Common Issues..." -ForegroundColor Red
     Write-Host ""
     
     Write-Host "      Creating missing directories..." -ForegroundColor Gray
@@ -229,9 +232,8 @@ cryptography>=3.4.0
 
 function Backup-Project {
     Write-Host ""
-    Write-Host "  [*] Creating Backup..." -ForegroundColor Cyan
+    Write-Host "  [*] Creating Backup..." -ForegroundColor Red
     
-    # Create backups folder if it doesn't exist
     $backupRoot = Join-Path $PWD "backups"
     if (!(Test-Path $backupRoot)) {
         New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
@@ -243,10 +245,8 @@ function Backup-Project {
     
     Write-Host "      Backup location: $backupFolder" -ForegroundColor Yellow
     
-    # Create the backup folder
     New-Item -ItemType Directory -Path $backupFolder -Force | Out-Null
     
-    # Files to backup
     $files = @(
         "ytimp4.py",
         "bootstrap.py",
@@ -269,7 +269,6 @@ function Backup-Project {
         }
     }
     
-    # Folders to backup
     $folders = @("templates", "static", "servers", "sync", "downloads", "archives")
     $folderCount = 0
     foreach ($folder in $folders) {
@@ -284,7 +283,6 @@ function Backup-Project {
         }
     }
     
-    # Create a manifest file
     $manifest = @"
 Backup created: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 Project: YTIMP4
@@ -301,7 +299,6 @@ Total size: $(Get-ChildItem -Path $backupFolder -Recurse | Measure-Object -Prope
     Write-Host "      Location: $backupFolder" -ForegroundColor Yellow
     Write-Host "      Files: $fileCount, Folders: $folderCount" -ForegroundColor Gray
     
-    # Ask if user wants to open the backup folder
     $openChoice = Read-Host "`n      Open backup folder? (y/n)"
     if ($openChoice -eq "y") {
         explorer $backupFolder
@@ -310,9 +307,9 @@ Total size: $(Get-ChildItem -Path $backupFolder -Recurse | Measure-Object -Prope
     Read-Host "`nPress Enter to continue"
 }
 
-function Clean-Cache {
+function Clear-Cache {
     Write-Host ""
-    Write-Host "  [*] Cleaning Cache..." -ForegroundColor Cyan
+    Write-Host "  [*] Cleaning Cache..." -ForegroundColor Red
     
     Write-Host "      Removing Python cache..." -ForegroundColor Gray
     Get-ChildItem -Path $PWD -Recurse -Filter "*.pyc" | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -349,12 +346,11 @@ function Clean-Cache {
 
 function Open-Explorer {
     Write-Host ""
-    Write-Host "  [*] Opening Explorer..." -ForegroundColor Cyan
+    Write-Host "  [*] Opening Explorer..." -ForegroundColor Red
     explorer .
     Read-Host "`nPress Enter to continue"
 }
 
-# Self-bypass for execution policy
 $scriptPath = $MyInvocation.MyCommand.Path
 $policy = Get-ExecutionPolicy
 if ($policy -eq "Restricted" -or $policy -eq "AllSigned") {
@@ -370,12 +366,12 @@ do {
     switch ($choice) {
         "1" { Sync-Git }
         "2" { Install-Dependencies }
-        "3" { Run-Application }
-        "4" { Run-Bootstrap }
-        "5" { Check-Status }
-        "6" { Fix-CommonIssues }
+        "3" { Start-Application }
+        "4" { Start-Bootstrap }
+        "5" { Get-Status }
+        "6" { Repair-CommonIssues }
         "7" { Backup-Project }
-        "8" { Clean-Cache }
+        "8" { Clear-Cache }
         "9" { Open-Explorer }
         "10" { Write-Host "`n  [*] Goodbye!" -ForegroundColor Green }
         default { Write-Host "`n      Invalid option. Please choose 1-10." -ForegroundColor Red }
