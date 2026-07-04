@@ -8,7 +8,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto', 'Segoe UI', Arial, sans-serif; background-color: #0a0a0a; color: #ffffff; transition: background 0.3s, color 0.3s; }
         
-        /* Light theme */
         body.light-theme { background-color: #f5f5f5; color: #1a1a1a; }
         body.light-theme .header, body.light-theme .sidebar, body.light-theme .content-area { background-color: #f5f5f5; }
         body.light-theme .status-card, body.light-theme .result-card, body.light-theme .settings-section,
@@ -50,7 +49,6 @@
         
         .content-area { flex: 1; padding: 2rem; background-color: #0a0a0a; }
         
-        /* Home Page Styles */
         .home-page { display: block; }
         .downloader-page { display: none; }
         .instructions-page { display: none; max-width: 700px; margin: 0 auto; }
@@ -112,7 +110,6 @@
         .eta-text { font-size: 0.7rem; color: #777777; margin-top: 0.25rem; text-align: center; }
         .queue-status { font-size: 0.75rem; color: #aaaaaa; margin-top: 0.5rem; text-align: center; }
         
-        /* Batch Download Panel */
         .batch-panel { background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
         .batch-input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .batch-url-input { flex: 1; padding: 0.6rem 1rem; background: #121212; border: 1px solid #2a2a2a; border-radius: 8px; color: #ffffff; }
@@ -120,7 +117,6 @@
         .batch-video-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; border-bottom: 1px solid #2a2a2a; }
         .batch-video-checkbox { width: 18px; height: 18px; cursor: pointer; }
         
-        /* History Panel */
         .history-panel { background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
         .history-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: #1a1a1a; border-bottom: 1px solid #2a2a2a; }
         .history-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-bottom: 1px solid #2a2a2a; transition: background 0.2s; }
@@ -132,7 +128,6 @@
         .history-status.completed { background: #1a3a1a; color: #10b981; }
         .history-status.failed { background: #3a1a1a; color: #ff8888; }
         
-        /* Language List */
         .language-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; max-height: 200px; overflow-y: auto; padding: 0.5rem; background: #0f0f0f; border-radius: 8px; border: 1px solid #2a2a2a; }
         .lang-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; background: #1a1a1a; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .lang-item:hover { background: #2a2a2a; transform: translateX(5px); }
@@ -140,11 +135,9 @@
         .lang-code { font-weight: 600; min-width: 40px; }
         .lang-name { flex: 1; }
         
-        /* Theme Toggle */
         .theme-toggle { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: #1f1f1f; border: 1px solid #2a2a2a; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; transition: all 0.3s; }
         .theme-toggle:hover { transform: scale(1.1); border-color: #ff0000; }
         
-        /* Settings Section */
         .settings-section { background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .settings-section-title { font-size: 1rem; font-weight: 600; color: #ff0000; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid #2a2a2a; }
         .settings-group { margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -209,7 +202,6 @@
         </div>
 
         <div class="content-area">
-            <!-- Home Page -->
             <div id="homePage" class="home-page">
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -254,7 +246,6 @@
                 </div>
             </div>
 
-            <!-- Downloader Page -->
             <div id="downloaderPage" class="downloader-page">
                 <div class="status-card">
                     <div class="status-text" id="statusText">Ready</div>
@@ -294,10 +285,8 @@
                 <div id="errorMsg" class="error-message"></div>
             </div>
 
-            <!-- Channel Page -->
             <div id="channelPage" class="channel-page"></div>
 
-            <!-- Settings Page -->
             <div id="settingsPage" class="settings-page">
                 <div class="status-card">
                     <div class="status-text">Settings</div>
@@ -381,7 +370,6 @@
                 <div id="settingsStatus" class="settings-status"></div>
             </div>
 
-            <!-- Instructions Page -->
             <div id="instructionsPage" class="instructions-page">
                 <div class="step-card"><div class="step-number">1</div><div class="step-content"><div class="step-title">Channel Lookup</div><div class="step-desc">Search for YouTube channels by name, handle, or URL</div></div></div>
                 <div class="step-card"><div class="step-number">2</div><div class="step-content"><div class="step-title">View Community Posts</div><div class="step-desc">Extract and display recent community posts from the channel</div></div></div>
@@ -397,7 +385,6 @@
     <div id="themeToggle" class="theme-toggle">ðŸŒ™</div>
 
     <script>
-        // DOM Elements
         const urlInput = document.getElementById('urlInput');
         const fetchBtn = document.getElementById('fetchBtn');
         const authBtn = document.getElementById('authBtn');
@@ -422,7 +409,6 @@
         const progressEta = document.getElementById('progressEta');
         const queueStatus = document.getElementById('queueStatus');
         
-        // Settings elements
         const apiKeyInput = document.getElementById('apiKeyInput');
         const downloadFolderInput = document.getElementById('downloadFolderInput');
         const maxConcurrentInput = document.getElementById('maxConcurrentInput');
@@ -436,7 +422,6 @@
         const clearHistoryBtn = document.getElementById('clearHistoryBtn');
         const settingsStatus = document.getElementById('settingsStatus');
         
-        // Page elements
         const homePage = document.getElementById('homePage');
         const downloaderPage = document.getElementById('downloaderPage');
         const instructionsPage = document.getElementById('instructionsPage');
@@ -445,7 +430,6 @@
         const navItems = document.querySelectorAll('.nav-item');
         const themeToggle = document.getElementById('themeToggle');
         
-        // State variables
         let currentVideoId = null;
         let progressInterval = null;
         let currentDownloadId = null;
@@ -453,7 +437,6 @@
         let downloadHistory = [];
         let activeDownloads = [];
         
-        // Language list
         const languages = [
             { code: 'en', name: 'English' }, { code: 'es', name: 'Spanish' }, { code: 'fr', name: 'French' },
             { code: 'de', name: 'German' }, { code: 'ja', name: 'Japanese' }, { code: 'ko', name: 'Korean' },
@@ -775,7 +758,6 @@
             updateQueueStatus();
         }
         
-        // Event Listeners
         authBtn.onclick = scanBrowsers;
         clearCookiesBtn.onclick = clearCookies;
         saveSettingsBtn.onclick = saveSettings;
