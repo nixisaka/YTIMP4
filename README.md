@@ -28,3 +28,10 @@
 Double-click `start.bat` or run:
 ```bash
 python bootstrap.py
+```
+
+---
+
+## Credits
+- nixisaka - Coding, Debugging, Creator
+- FILipKOS_Gacha - BAT file, Tester
