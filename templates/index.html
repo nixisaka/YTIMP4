@@ -46,6 +46,7 @@
         .nav-item:hover { background-color: #121212; color: #ffffff; }
         .nav-item.active { background-color: #121212; color: #ff0000; }
         .nav-icon { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; }
+        .nav-icon img { width: 22px; height: 22px; object-fit: contain; }
         
         .content-area { flex: 1; padding: 2rem; background-color: #0a0a0a; }
         
@@ -77,7 +78,6 @@
         .quick-btn { padding: 0.6rem 1.25rem; background: #121212; border: 1px solid #2a2a2a; border-radius: 40px; cursor: pointer; transition: all 0.2s; }
         .quick-btn:hover { background: #1f1f1f; border-color: #ff0000; }
         
-        /* Downloader Page Styles */
         .status-card { background: #0f0f0f; border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; border: 1px solid #1f1f1f; }
         .status-text { font-size: 0.9rem; color: #aaaaaa; margin-bottom: 0.5rem; }
         .result-card { background: #0f0f0f; border-radius: 16px; overflow: hidden; display: none; border: 1px solid #1f1f1f; }
@@ -194,11 +194,26 @@
 
     <div class="main-wrapper">
         <div class="sidebar">
-            <div class="nav-item" data-page="home"><span class="nav-icon">ðŸ </span><span>Home</span></div>
-            <div class="nav-item" data-page="downloader"><span class="nav-icon">ðŸ“¥</span><span>Downloader</span></div>
-            <div class="nav-item" data-page="channel"><span class="nav-icon">ðŸ“º</span><span>Channel Lookup</span></div>
-            <div class="nav-item" data-page="settings"><span class="nav-icon">âš™ï¸</span><span>Settings</span></div>
-            <div class="nav-item" data-page="instructions"><span class="nav-icon">â“</span><span>Instructions</span></div>
+            <div class="nav-item active" data-page="home">
+                <span class="nav-icon"><img src="/.icons/home.svg" alt="Home" onerror="this.src='/.static/fallback.png'"></span>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" data-page="downloader">
+                <span class="nav-icon"><img src="/.icons/download.svg" alt="Downloader" onerror="this.src='/.static/fallback.png'"></span>
+                <span>Downloader</span>
+            </div>
+            <div class="nav-item" data-page="channel">
+                <span class="nav-icon"><img src="/.icons/channel.svg" alt="Channel Lookup" onerror="this.src='/.static/fallback.png'"></span>
+                <span>Channel Lookup</span>
+            </div>
+            <div class="nav-item" data-page="settings">
+                <span class="nav-icon"><img src="/.icons/settings.svg" alt="Settings" onerror="this.src='/.static/fallback.png'"></span>
+                <span>Settings</span>
+            </div>
+            <div class="nav-item" data-page="instructions">
+                <span class="nav-icon"><img src="/.icons/instructions.svg" alt="Instructions" onerror="this.src='/.static/fallback.png'"></span>
+                <span>Instructions</span>
+            </div>
         </div>
 
         <div class="content-area">
@@ -225,9 +240,9 @@
                 <div class="home-card">
                     <div class="card-title">Quick Actions</div>
                     <div class="quick-actions">
-                        <button id="quickPasteBtn" class="quick-btn">ðŸ“‹ Paste from Clipboard</button>
-                        <button id="quickBatchBtn" class="quick-btn">ðŸ“ Batch Download</button>
-                        <button id="quickPlaylistBtn" class="quick-btn">ðŸŽ¬ Playlist Download</button>
+                        <button id="quickPasteBtn" class="quick-btn">Paste from Clipboard</button>
+                        <button id="quickBatchBtn" class="quick-btn">Batch Download</button>
+                        <button id="quickPlaylistBtn" class="quick-btn">Playlist Download</button>
                     </div>
                 </div>
                 
@@ -382,7 +397,7 @@
     </div>
 
     <div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div id="loadingText" class="loading-text">Processing...</div></div>
-    <div id="themeToggle" class="theme-toggle">ðŸŒ™</div>
+    <div id="themeToggle" class="theme-toggle">&#127769;</div>
 
     <script>
         const urlInput = document.getElementById('urlInput');
@@ -468,12 +483,12 @@
             const savedTheme = localStorage.getItem('ytimp4_theme');
             if (savedTheme === 'light') {
                 document.body.classList.add('light-theme');
-                themeToggle.innerHTML = 'â˜€ï¸';
+                themeToggle.innerHTML = '&#9728;';
             }
             themeToggle.onclick = () => {
                 document.body.classList.toggle('light-theme');
                 const isLight = document.body.classList.contains('light-theme');
-                themeToggle.innerHTML = isLight ? 'â˜€ï¸' : 'ðŸŒ™';
+                themeToggle.innerHTML = isLight ? '&#9728;' : '&#127769;';
                 localStorage.setItem('ytimp4_theme', isLight ? 'light' : 'dark');
             };
         }
