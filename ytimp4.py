@@ -31,7 +31,7 @@ class ConfigManager:
             with open(self.config_file, 'r') as f:
                 return json.load(f)
         return {
-            "youtube_api_key": "AIzaSyBXTPfHXAiof-IlskrPVWarp2j37TAKdW0",
+            "youtube_api_key": "ADD_YOUR_KEY_HERE",
             "download_queue": [],
             "settings": {
                 "max_concurrent_downloads": 3,
