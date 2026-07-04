@@ -1,292 +1,255 @@
 $ErrorActionPreference = "Stop"
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$BackupFolder = Join-Path $env:USERPROFILE "YTIMP4_backup_$Timestamp"
 
-Write-Host ""
-Write-Host "YTIMP4 - Sync & Save"
-Write-Host "===================="
-Write-Host ""
+function Show-Menu {
+    Clear-Host
+    Write-Host ""
+    Write-Host "░██     ░██ ░██████████░██████░███     ░███ ░█████████     ░████                 ░██████████  ░██████     ░██████   ░██         ░████████     ░██████   ░██    ░██ " -ForegroundColor Red
+    Write-Host "░██   ░██      ░██      ░██  ░████   ░████ ░██     ░██   ░██ ██                     ░██     ░██   ░██   ░██   ░██  ░██         ░██    ░██   ░██   ░██   ░██  ░██  " -ForegroundColor Red
+    Write-Host " ░██ ░██       ░██      ░██  ░██░██ ░██░██ ░██     ░██  ░██  ██                     ░██    ░██     ░██ ░██     ░██ ░██         ░██    ░██  ░██     ░██   ░██░██   " -ForegroundColor Red
+    Write-Host "  ░████        ░██      ░██  ░██ ░████ ░██ ░█████████  ░██   ██      ░██████        ░██    ░██     ░██ ░██     ░██ ░██         ░████████   ░██     ░██    ░███    " -ForegroundColor Red
+    Write-Host "   ░██         ░██      ░██  ░██  ░██  ░██ ░██         ░█████████                   ░██    ░██     ░██ ░██     ░██ ░██         ░██     ░██ ░██     ░██   ░██░██   " -ForegroundColor Red
+    Write-Host "   ░██         ░██      ░██  ░██       ░██ ░██              ░██                     ░██     ░██   ░██   ░██   ░██  ░██         ░██     ░██  ░██   ░██   ░██  ░██  " -ForegroundColor Red
+    Write-Host "   ░██         ░██    ░██████░██       ░██ ░██              ░██                     ░██      ░██████     ░██████   ░██████████ ░█████████    ░██████   ░██    ░██ " -ForegroundColor Red
+    Write-Host ""
+    Write-Host "                                     YTIMP4 - Toolbox" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "═══════════════════════════════════════════════════════════════════════════════════" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  1. Sync Git Repository"
+    Write-Host "  2. Install Dependencies"
+    Write-Host "  3. Run Application"
+    Write-Host "  4. Check Status"
+    Write-Host "  5. Fix Common Issues"
+    Write-Host "  6. Backup Project"
+    Write-Host "  7. Clean Cache"
+    Write-Host "  8. Open in Explorer"
+    Write-Host "  9. Exit"
+    Write-Host ""
+    Write-Host "═══════════════════════════════════════════════════════════════════════════════════" -ForegroundColor Gray
+    Write-Host ""
+}
 
-Write-Host "Checking Python..."
-try {
+function Sync-Git {
+    Write-Host ""
+    Write-Host "░ Syncing Git Repository..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    $branch = git branch --show-current
+    Write-Host "  Current branch: $branch" -ForegroundColor Yellow
+    Write-Host ""
+    
+    Write-Host "  Fetching updates..." -ForegroundColor Gray
+    git fetch origin
+    Write-Host ""
+    
+    Write-Host "  Pulling latest changes..." -ForegroundColor Gray
+    git pull origin $branch
+    Write-Host ""
+    
+    $changes = git status --porcelain
+    if ($changes) {
+        Write-Host "  Changes detected:" -ForegroundColor Yellow
+        git status --short
+        Write-Host ""
+        $choice = Read-Host "  Add and commit changes? (y/n)"
+        if ($choice -eq "y") {
+            git add .
+            $msg = Read-Host "  Commit message"
+            if ($msg) {
+                git commit -m $msg
+                Write-Host ""
+                Write-Host "  Pushing to origin..." -ForegroundColor Gray
+                git push origin $branch
+            }
+        }
+    } else {
+        Write-Host "  No changes detected" -ForegroundColor Green
+    }
+    
+    Write-Host ""
+    Write-Host "  Sync complete!" -ForegroundColor Green
+    Read-Host "`nPress Enter to continue"
+}
+
+function Install-Dependencies {
+    Write-Host ""
+    Write-Host "░ Installing Dependencies..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    $requirements = @(
+        "flask",
+        "yt-dlp",
+        "requests",
+        "beautifulsoup4",
+        "aiohttp",
+        "colorama",
+        "google-api-python-client"
+    )
+    
+    foreach ($pkg in $requirements) {
+        Write-Host "  Installing $pkg..." -ForegroundColor Gray
+        pip install $pkg -q 2>&1 | Out-Null
+        Write-Host "  $pkg [OK]" -ForegroundColor Green
+    }
+    
+    Write-Host ""
+    Write-Host "  Dependencies installed!" -ForegroundColor Green
+    Read-Host "`nPress Enter to continue"
+}
+
+function Run-Application {
+    Write-Host ""
+    Write-Host "░ Starting YTIMP4..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    if (Test-Path "ytimp4.py") {
+        Write-Host "  Opening http://localhost:8080..." -ForegroundColor Yellow
+        Start-Process "http://localhost:8080"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "python ytimp4.py"
+    } else {
+        Write-Host "  ytimp4.py not found!" -ForegroundColor Red
+    }
+    
+    Read-Host "`nPress Enter to continue"
+}
+
+function Check-Status {
+    Write-Host ""
+    Write-Host "░ Checking Status..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    $files = @(
+        "ytimp4.py",
+        "bootstrap.py",
+        "requirements.txt",
+        "start.bat",
+        "config.json"
+    )
+    
+    foreach ($file in $files) {
+        if (Test-Path $file) {
+            Write-Host "  $file [OK]" -ForegroundColor Green
+        } else {
+            Write-Host "  $file [MISSING]" -ForegroundColor Red
+        }
+    }
+    
+    Write-Host ""
+    Write-Host "  Git Status:" -ForegroundColor Yellow
+    git status --short
+    
+    Write-Host ""
+    Write-Host "  Python Version:" -ForegroundColor Yellow
     python --version
-    Write-Host "[OK]" -ForegroundColor Green
-} catch {
-    Write-Host "Python not found!" -ForegroundColor Red
-    exit 1
+    
+    Read-Host "`nPress Enter to continue"
 }
 
-Write-Host ""
-Write-Host "Setting up virtual environment..."
-if (Test-Path "$ProjectRoot\.venv\Scripts\Activate.ps1") {
-    & "$ProjectRoot\.venv\Scripts\Activate.ps1"
-    Write-Host "[OK] venv activated" -ForegroundColor Green
-} else {
-    Write-Host "Creating venv..."
-    python -m venv "$ProjectRoot\.venv"
-    & "$ProjectRoot\.venv\Scripts\Activate.ps1"
+function Fix-CommonIssues {
+    Write-Host ""
+    Write-Host "░ Fixing Common Issues..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    Write-Host "  Creating missing directories..." -ForegroundColor Gray
+    @("static/icons", "templates", "servers", "sync", "debugging", "setup").ForEach({
+        New-Item -ItemType Directory -Path $_ -Force | Out-Null
+        Write-Host "    $_ [OK]" -ForegroundColor Green
+    })
+    
+    Write-Host ""
+    Write-Host "  Running pip install..." -ForegroundColor Gray
+    pip install flask yt-dlp requests beautifulsoup4 aiohttp colorama google-api-python-client -q
+    
+    Write-Host ""
+    Write-Host "  Fixing git line endings..." -ForegroundColor Gray
+    git config core.autocrlf true
+    
+    Write-Host ""
+    Write-Host "  Done!" -ForegroundColor Green
+    Read-Host "`nPress Enter to continue"
 }
 
-Write-Host ""
-Write-Host "Checking packages..."
-$requirements = @(
-    "flask>=2.0.0",
-    "yt-dlp>=2023.0.0",
-    "requests>=2.25.0",
-    "beautifulsoup4>=4.9.0",
-    "aiohttp>=3.8.0",
-    "colorama>=0.4.4",
-    "google-api-python-client>=2.0.0"
-)
-
-foreach ($pkg in $requirements) {
-    $pkgName = ($pkg -split '>=')[0]
-    try {
-        pip show $pkgName 2>&1 | Out-Null
-        Write-Host "  $pkgName [OK]" -ForegroundColor Green
-    } catch {
-        Write-Host "  Installing $pkgName..."
-        pip install $pkgName -q
-        Write-Host "  $pkgName done" -ForegroundColor Green
-    }
-}
-
-Write-Host ""
-Write-Host "Fixing bootstrap.py..."
-$bootstrapPath = "$ProjectRoot\bootstrap.py"
-if (Test-Path $bootstrapPath) {
-    $content = Get-Content $bootstrapPath -Raw
-    if ($content -match "split\('<')[0") {
-        Write-Host "Missing bracket found. Fixing..." -ForegroundColor Yellow
-        $content = $content -replace "split\('<')[0", "split('<')[0]"
-        Set-Content -Path $bootstrapPath -Value $content -NoNewline
-        Write-Host "Fixed" -ForegroundColor Green
-    } else {
-        Write-Host "bootstrap.py looks fine" -ForegroundColor Green
-    }
-}
-
-Write-Host ""
-Write-Host "Updating requirements.txt..."
-$reqPath = "$ProjectRoot\requirements.txt"
-$reqContent = @"
-flask>=2.0.0
-yt-dlp>=2023.0.0
-requests>=2.25.0
-beautifulsoup4>=4.9.0
-aiohttp>=3.8.0
-colorama>=0.4.4
-google-api-python-client>=2.0.0
-"@
-
-if (Test-Path $reqPath) {
-    $current = Get-Content $reqPath -Raw
-    if ($current -ne $reqContent) {
-        Write-Host "Updating..."
-        Set-Content -Path $reqPath -Value $reqContent
-        Write-Host "Done" -ForegroundColor Green
-    } else {
-        Write-Host "Already up to date" -ForegroundColor Green
-    }
-} else {
-    Write-Host "Creating..."
-    Set-Content -Path $reqPath -Value $reqContent
-    Write-Host "Created" -ForegroundColor Green
-}
-
-Write-Host ""
-Write-Host "Checking start.bat..."
-$batPath = "$ProjectRoot\start.bat"
-$batContent = @'
-@echo off
-chcp 65001 > nul
-title YTIMP4
-cd /d "%~dp0"
-
-echo Starting YTIMP4...
-python bootstrap.py
-
-timeout /t 2 /nobreak > nul
-start http://localhost:8080
-pause
-'@
-
-if (Test-Path $batPath) {
-    $current = Get-Content $batPath -Raw
-    if ($current -ne $batContent) {
-        Write-Host "Updating..."
-        Set-Content -Path $batPath -Value $batContent
-        Write-Host "Done" -ForegroundColor Green
-    } else {
-        Write-Host "Already up to date" -ForegroundColor Green
-    }
-} else {
-    Write-Host "Creating..."
-    Set-Content -Path $batPath -Value $batContent
-    Write-Host "Created" -ForegroundColor Green
-}
-
-Write-Host ""
-Write-Host "Creating backup..."
-if (!(Test-Path $BackupFolder)) {
-    New-Item -ItemType Directory -Path $BackupFolder -Force | Out-Null
-}
-
-$filesToBackup = @(
-    "bootstrap.py",
-    "ytimp4.py",
-    "config.json",
-    "requirements.txt",
-    "start.bat"
-)
-
-foreach ($file in $filesToBackup) {
-    $src = Join-Path $ProjectRoot $file
-    $dst = Join-Path $BackupFolder $file
-    if (Test-Path $src) {
-        Copy-Item -Path $src -Destination $dst -Force
-        Write-Host "  $file backed up" -ForegroundColor Gray
-    }
-}
-Write-Host "Backup saved to: $BackupFolder" -ForegroundColor Green
-
-Write-Host ""
-Write-Host "Generating sync.json..."
-$syncPath = "$ProjectRoot\sync\sync.json"
-$syncData = @{
-    version = "1.0.0"
-    last_scan = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-    project_root = $ProjectRoot
-    files = @{}
-    folders = @{
-        servers = @{
-            path = "servers"
-            files = @("__init__.py", "channel_lookup.py", "channel_processor.py")
-        }
-        templates = @{
-            path = "templates"
-            files = @("index.html", "style.css")
-        }
-        sync = @{
-            path = "sync"
-            files = @("sync.json", "sync_manager.py", "__init__.py")
-        }
-        debugging = @{
-            path = "debugging"
-            files = @("debug.bat", "debug.py")
-        }
-        setup = @{
-            path = "setup"
-            files = @("bootstrap.py", "start.bat")
-        }
-        icons = @{
-            path = ".icons"
-            files = @("downloader.svg", "instructions.svg", "refresh.svg", "trash.svg", "channel.svg", "archive.svg")
+function Backup-Project {
+    Write-Host ""
+    Write-Host "░ Creating Backup..." -ForegroundColor Cyan
+    
+    $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $backupFolder = "backup_$timestamp"
+    
+    Write-Host "  Backup folder: $backupFolder" -ForegroundColor Yellow
+    
+    New-Item -ItemType Directory -Path $backupFolder -Force | Out-Null
+    
+    $files = @(
+        "ytimp4.py",
+        "bootstrap.py",
+        "requirements.txt",
+        "start.bat",
+        "config.json"
+    )
+    
+    foreach ($file in $files) {
+        if (Test-Path $file) {
+            Copy-Item -Path $file -Destination "$backupFolder\" -Force
+            Write-Host "    $file backed up" -ForegroundColor Green
         }
     }
-    dependencies = @{
-        requirements_file = "requirements.txt"
-        python_version = ">=3.8"
+    
+    if (Test-Path "templates") {
+        Copy-Item -Path "templates" -Destination "$backupFolder\" -Recurse -Force
+        Write-Host "    templates backed up" -ForegroundColor Green
     }
-    scripts = @{
-        start = "start.bat"
-        bootstrap = "bootstrap.py"
-        main = "ytimp4.py"
+    
+    if (Test-Path "static") {
+        Copy-Item -Path "static" -Destination "$backupFolder\" -Recurse -Force
+        Write-Host "    static backed up" -ForegroundColor Green
     }
-    ports = @{
-        default = 8080
-        range_start = 8080
-        range_end = 8090
+    
+    Write-Host ""
+    Write-Host "  Backup complete: $backupFolder" -ForegroundColor Green
+    Read-Host "`nPress Enter to continue"
+}
+
+function Clean-Cache {
+    Write-Host ""
+    Write-Host "░ Cleaning Cache..." -ForegroundColor Cyan
+    
+    Write-Host "  Removing Python cache..." -ForegroundColor Gray
+    Remove-Item -Path "*.pyc" -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "__pycache__" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Write-Host "  Removing venv..." -ForegroundColor Gray
+    Remove-Item -Path ".venv" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Write-Host "  Removing .vscode cache..." -ForegroundColor Gray
+    Remove-Item -Path ".vscode" -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Write-Host ""
+    Write-Host "  Cache cleaned!" -ForegroundColor Green
+    Read-Host "`nPress Enter to continue"
+}
+
+function Open-Explorer {
+    Write-Host ""
+    Write-Host "░ Opening Explorer..." -ForegroundColor Cyan
+    explorer .
+    Read-Host "`nPress Enter to continue"
+}
+
+do {
+    Show-Menu
+    $choice = Read-Host "Select option"
+    
+    switch ($choice) {
+        "1" { Sync-Git }
+        "2" { Install-Dependencies }
+        "3" { Run-Application }
+        "4" { Check-Status }
+        "5" { Fix-CommonIssues }
+        "6" { Backup-Project }
+        "7" { Clean-Cache }
+        "8" { Open-Explorer }
+        "9" { Write-Host "`n░ Goodbye!" -ForegroundColor Green }
+        default { Write-Host "`n  Invalid option" -ForegroundColor Red }
     }
-}
-
-$projectFiles = Get-ChildItem -Path $ProjectRoot -Recurse -File | Where-Object {
-    $_.Name -notmatch "\.pyc$" -and
-    $_.FullName -notmatch "\.venv" -and
-    $_.FullName -notmatch "__pycache__" -and
-    $_.FullName -notmatch "\.vscode" -and
-    $_.FullName -notmatch "archives" -and
-    $_.FullName -notmatch "downloads" -and
-    $_.FullName -notmatch "static"
-}
-
-foreach ($file in $projectFiles) {
-    $relPath = $file.FullName.Replace($ProjectRoot, "").TrimStart("\")
-    $hash = Get-FileHash -Path $file.FullName -Algorithm MD5
-    $syncData.files[$relPath] = @{
-        size = $file.Length
-        modified = $file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
-        hash = $hash.Hash
-    }
-}
-
-$syncData | ConvertTo-Json -Depth 10 | Set-Content -Path $syncPath -Encoding UTF8
-Write-Host "sync.json generated" -ForegroundColor Green
-
-Write-Host ""
-Write-Host "Verifying files..."
-if (Test-Path "$ProjectRoot\ytimp4.py") {
-    Write-Host "  ytimp4.py [OK]" -ForegroundColor Green
-} else {
-    Write-Host "  ytimp4.py [MISSING]" -ForegroundColor Red
-}
-
-if (Test-Path "$ProjectRoot\servers\__init__.py") {
-    Write-Host "  servers/__init__.py [OK]" -ForegroundColor Green
-} else {
-    Write-Host "  servers/__init__.py [MISSING]" -ForegroundColor Red
-}
-
-if (Test-Path "$ProjectRoot\servers\channel_lookup.py") {
-    Write-Host "  servers/channel_lookup.py [OK]" -ForegroundColor Green
-} else {
-    Write-Host "  servers/channel_lookup.py [MISSING]" -ForegroundColor Red
-}
-
-Write-Host ""
-Write-Host "Testing bootstrap.py..."
-try {
-    python -m py_compile "$ProjectRoot\bootstrap.py"
-    Write-Host "bootstrap.py compiles [OK]" -ForegroundColor Green
-} catch {
-    Write-Host "bootstrap.py has errors!" -ForegroundColor Red
-}
-
-Write-Host ""
-Write-Host "Creating index.html with SVG icons..."
-$svgHome = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'
-$svgDownloader = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>'
-$svgChannel = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M10 15l5.5-3-5.5-3v6zM21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>'
-$svgSettings = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>'
-$svgInstructions = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>'
-
-$htmlPath = "$ProjectRoot\templates\index.html"
-if (Test-Path $htmlPath) {
-    $html = Get-Content $htmlPath -Raw
-    $html = $html -replace '🏠', $svgHome
-    $html = $html -replace '📥', $svgDownloader
-    $html = $html -replace '📺', $svgChannel
-    $html = $html -replace '⚙️', $svgSettings
-    $html = $html -replace '❓', $svgInstructions
-    Set-Content -Path $htmlPath -Value $html -Encoding UTF8
-    Write-Host "index.html updated with SVG icons" -ForegroundColor Green
-} else {
-    Write-Host "index.html not found" -ForegroundColor Yellow
-}
-
-Write-Host ""
-Write-Host "============="
-Write-Host "Sync Complete!"
-Write-Host "============="
-Write-Host ""
-Write-Host "Backup: $BackupFolder"
-Write-Host "Sync:   $syncPath"
-Write-Host ""
-Write-Host "To run:"
-Write-Host "  start.bat"
-Write-Host "  python bootstrap.py"
-Write-Host "  python ytimp4.py"
-Write-Host ""
-
-Read-Host "Press Enter to exit"
+} while ($choice -ne "9")
