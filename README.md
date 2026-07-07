@@ -1,9 +1,11 @@
-<div align="center">
-  <img src="https://img.icons8.com/color/48/000000/youtube-play.png" alt="YouTube Logo" width="48" height="48">
-  <h1>YTIMP4</h1>
-  <p><strong>YouTube Downloader</strong></p>
-  <p>YTIMP4 is a tool to download MP3/MP4 files, videos, and live streams from YouTube</p>
-</div>
+<div align="left">
+  <img src="https://img.icons8.com/color/48/000000/youtube-play.png" alt="YouTube Logo" width="48" height="48" style="vertical-align: middle;">
+  <h1 style="display: inline-block; vertical-align: middle; margin-left: 10px;">YTIMP4</h1>
+</div>>
+
+**YouTube Downloader**
+
+YTIMP4 is a tool to download MP3/MP4 files, videos, and live streams from YouTube
 
 ---
 
