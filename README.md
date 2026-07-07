@@ -1,11 +1,31 @@
-<div align="left">
-  <img src="https://img.icons8.com/color/48/000000/youtube-play.png" alt="YouTube Logo" width="48" height="48" style="vertical-align: middle;">
-  <h1 style="display: inline-block; vertical-align: middle; margin-left: 10px;">YTIMP4</h1>
-</div>>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>README.md</title>
+</head>
+<body>
+    <pre>
+# YTIMP4
 
-**YouTube Downloader**
+[![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 
-YTIMP4 is a tool to download MP3/MP4 files, videos, and live streams from YouTube
+**YouTube Downloader** — download MP3/MP4 files, videos, and live streams.
+
+---
+
+## Download
+
+- [GitHub Releases](https://github.com/nixisaka/YTIMP4/releases)
+- Clone the repository:
+git clone https://github.com/nixisaka/YTIMP4.git
+cd YTIMP4
+pip install -r requirements.txt
+python ytimp4.py
+
+text
 
 ---
 
@@ -24,16 +44,37 @@ YTIMP4 is a tool to download MP3/MP4 files, videos, and live streams from YouTub
 
 ---
 
-## Quick Start
+## Usage
 
-## Windows
-Double-click `start.bat` or run:
-```bash
+**Windows**: Double-click `start.bat` or run:
 python bootstrap.py
-```
+
+text
+
+**Linux / macOS**:
+python3 ytimp4.py
+
+text
 
 ---
 
-## Credits
-- Nixisaka - Coding, Debugging, Creator
-- FILipKOS_Gacha - BAT file, Tester
+## Dependencies
+
+- Flask
+- yt-dlp
+- requests
+- beautifulsoup4
+- aiohttp
+- colorama
+- google-api-python-client
+
+---
+
+## License
+
+MIT License
+
+Copyright (c) 2026 nixisaka
+    </pre>
+</body>
+</html
