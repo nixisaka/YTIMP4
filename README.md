@@ -1,37 +1,68 @@
-<div align="center">
-  <img src="https://img.icons8.com/color/48/000000/youtube-play.png" alt="YouTube Logo" width="48" height="48">
-  <h1>YTIMP4</h1>
-  <p><strong>YouTube Downloader</strong></p>
-  <p>Download videos and audio from YouTube with a clean web interface</p>
-</div>
+# YTIMP4
+
+[![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+
+**YouTube Downloader** — download MP3/MP4 files, videos, and live streams.
+
+---
+
+## Download
+
+- [GitHub Releases](https://github.com/nixisaka/YTIMP4/releases)
+- Clone the repository:
+  ```
+  git clone https://github.com/nixisaka/YTIMP4.git
+  cd YTIMP4
+  pip install -r requirements.txt
+  python ytimp4.py
+  ```
 
 ---
 
 ## Features
 
-- Download MP4 videos in best quality
-- Extract MP3 audio with thumbnail embedding
-- Download subtitles in SRT format
-- Channel lookup and archive tool
-- Queue management with persistence
-- Auto-subtitle download support
-- Browser cookie scanning for authentication
-- Download history tracking
-- Dark/Light theme toggle
-- Batch download support
+- MP4 downloads (1080p+)
+- MP3 extraction with thumbnails
+- SRT subtitle downloads
+- Channel lookup & archive
+- Download queue
+- Auto subtitles
+- Cookie scanning
+- Download history
+- Dark/Light themes
+- Batch downloading
 
 ---
 
-## Quick Start
+## Usage
 
-## Windows
-Double-click `start.bat` or run:
-```bash
+**Windows**: Double-click `start.bat` or run:
+```
 python bootstrap.py
+```
+
+**Linux / macOS**:
+```
+python3 ytimp4.py
 ```
 
 ---
 
-## Credits
-- Nixisaka - Coding, Debugging, Creator
-- FILipKOS_Gacha - BAT file, Tester
+## Dependencies
+
+- Flask
+- yt-dlp
+- requests
+- beautifulsoup4
+- aiohttp
+- colorama
+- google-api-python-client
+
+---
+
+## License
+
+MIT License
+
+Copyright (c) 2026 nixisaka
