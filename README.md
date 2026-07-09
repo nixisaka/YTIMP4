@@ -25,7 +25,7 @@ python bootstrap.py
 ### Linux / macOS
 
 ```bash
-python3 ytimp4.py or double-click start.bat that's in the setup folder
+python3 ytimp4.py
 ```
 
 ---
