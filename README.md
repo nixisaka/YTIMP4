@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # YTIMP4
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -17,6 +18,16 @@
   pip install -r requirements.txt
   python ytimp4.py
   ```
+=======
+<div align="left">
+  <img src="https://img.icons8.com/color/48/000000/youtube-play.png" alt="YouTube Logo" width="48" height="48" style="vertical-align: middle;">
+  <h1 style="display: inline-block; vertical-align: middle; margin-left: 10px;">YTIMP4</h1>
+</div>>
+
+**YouTube Downloader**
+
+YTIMP4 is a tool to download MP3/MP4 files, videos, and live streams from YouTube
+>>>>>>> a0cbb1cc1db5cd4eca20c940f0bf3b64e41e1717
 
 ---
 

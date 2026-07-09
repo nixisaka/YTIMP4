@@ -13,13 +13,16 @@ import asyncio
 import aiohttp
 import urllib.parse
 from pathlib import Path
-from flask import Flask, render_template_string, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, jsonify, url_for
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            static_folder='static',
+            static_url_path='/static',
+            template_folder='templates')
 
 DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "downloads")
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
@@ -167,13 +170,6 @@ def run_ytdlp_download(cmd, download_id, output_path):
             download_progress[download_id] = {'percent': 0, 'error': 'Download failed', 'completed': True}
     except Exception as e:
         download_progress[download_id] = {'percent': 0, 'error': str(e), 'completed': True}
-
-ICON_DOWNLOADER = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>'
-ICON_INSTRUCTIONS = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>'
-ICON_REFRESH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>'
-ICON_TRASH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>'
-ICON_CHANNEL = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.5-3-5.5-3v6zM21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>'
-ICON_ARCHIVE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>'
 
 async def fetch_channel_html_async(session, channel_url):
     try:
@@ -347,991 +343,9 @@ async def search_channels_async(query):
             logger.error(f"Search error: {e}")
     return results
 
-HTML = r"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YTIMP4</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', -apple-system, Roboto, Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #e5e5e5;
-        }
-
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background-color: #2a2a2a;
-            border-bottom: 1px solid #3a3a3a;
-            padding: 0.75rem 1.5rem;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-        }
-
-        .logo span:first-child {
-            color: #ff0000;
-        }
-
-        .logo span:last-child {
-            color: #ffffff;
-            font-weight: 400;
-        }
-
-        .search-container {
-            flex: 1;
-            max-width: 600px;
-            display: flex;
-            gap: 0;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            background-color: #2a2a2a;
-            border: 1px solid #4a4a4a;
-            border-radius: 40px 0 0 40px;
-            color: #ffffff;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .search-input:focus {
-            border-color: #1c62b9;
-        }
-
-        .search-button {
-            padding: 0.6rem 1.25rem;
-            background-color: #4a4a4a;
-            border: 1px solid #4a4a4a;
-            border-left: none;
-            border-radius: 0 40px 40px 0;
-            color: #ffffff;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .search-button:hover {
-            background-color: #5a5a5a;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            background: #3a3a3a;
-            color: #e5e5e5;
-        }
-
-        .action-btn:hover {
-            background-color: #4a4a4a;
-        }
-
-        .main-wrapper {
-            display: flex;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: calc(100vh - 60px);
-        }
-
-        .sidebar {
-            width: 240px;
-            background-color: #2a2a2a;
-            padding: 1rem 0.75rem;
-            border-right: 1px solid #3a3a3a;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.6rem 0.75rem;
-            margin: 0.25rem 0;
-            border-radius: 10px;
-            color: #aaaaaa;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-item:hover {
-            background-color: #3a3a3a;
-            color: #ffffff;
-        }
-
-        .nav-item.active {
-            background-color: #3a3a3a;
-            color: #ffffff;
-        }
-
-        .nav-icon {
-            width: 22px;
-            height: 22px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .content-area {
-            flex: 1;
-            padding: 2rem;
-            background-color: #1a1a1a;
-        }
-
-        .downloader-page {
-            display: block;
-        }
-
-        .instructions-page {
-            display: none;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .channel-page {
-            display: none;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .status-card {
-            background: #2a2a2a;
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            border: 1px solid #3a3a3a;
-        }
-
-        .status-text {
-            font-size: 0.9rem;
-            color: #9ca3af;
-            margin-bottom: 0.5rem;
-        }
-
-        .result-card {
-            background: #2a2a2a;
-            border-radius: 16px;
-            overflow: hidden;
-            display: none;
-            border: 1px solid #3a3a3a;
-        }
-
-        .video-info {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            padding: 1.5rem;
-        }
-
-        .thumbnail {
-            width: 320px;
-            border-radius: 12px;
-            object-fit: cover;
-        }
-
-        .thumbnail-container {
-            position: relative;
-        }
-
-        .live-badge {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            background: #ff0000;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        .details {
-            flex: 1;
-        }
-
-        .video-title {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .video-meta {
-            color: #9ca3af;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .actions {
-            background: #3a3a3a;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-
-        .download-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .download-btn {
-            flex: 1;
-            padding: 0.7rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .download-btn.mp4 {
-            background: #cc0000;
-            color: white;
-        }
-
-        .download-btn.mp4:hover {
-            background: #aa0000;
-        }
-
-        .download-btn.mp3 {
-            background: #1e5631;
-            color: white;
-        }
-
-        .download-btn.mp3:hover {
-            background: #164523;
-        }
-
-        .progress-container {
-            display: none;
-            margin-top: 1rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background-color: #4a4a4a;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background-color: #ff0000;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            font-size: 0.75rem;
-            color: #9ca3af;
-            margin-top: 0.5rem;
-            text-align: center;
-        }
-
-        .progress-speed {
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-            text-align: center;
-        }
-
-        .eta-text {
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-            text-align: center;
-        }
-
-        .step-card {
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 14px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .step-number {
-            width: 28px;
-            height: 28px;
-            background: #ff0000;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        .step-title {
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
-
-        .step-desc {
-            font-size: 0.8rem;
-            color: #9ca3af;
-        }
-
-        .error-message {
-            background: #3a2a2a;
-            border-left: 3px solid #ff0000;
-            padding: 0.75rem;
-            margin-top: 1rem;
-            border-radius: 8px;
-            display: none;
-            font-size: 0.8rem;
-            color: #ff8888;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.95);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid #4a4a4a;
-            border-top: 3px solid #ff0000;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .loading-text {
-            font-size: 0.9rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .features {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #3a3a3a;
-            font-size: 0.7rem;
-            color: #6b7280;
-            flex-wrap: wrap;
-        }
-
-        .channel-input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .channel-input {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            background-color: #2a2a2a;
-            border: 1px solid #4a4a4a;
-            border-radius: 40px;
-            color: #ffffff;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .channel-btn {
-            padding: 0.6rem 1.25rem;
-            background-color: #4a6a8a;
-            border: none;
-            border-radius: 40px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .channel-result {
-            margin-top: 1rem;
-        }
-
-        .channel-card {
-            background: #2a2a2a;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            border: 1px solid #3a3a3a;
-        }
-
-        .channel-name {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .channel-handle {
-            color: #9ca3af;
-            font-size: 0.8rem;
-        }
-
-        .channel-stats {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-            color: #6b7280;
-            flex-wrap: wrap;
-        }
-
-        .community-post {
-            background: #3a3a3a;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-left: 3px solid #4a6a8a;
-        }
-
-        .post-text {
-            color: #e5e5e5;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-date {
-            color: #6b7280;
-            font-size: 0.7rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.7rem;
-            color: #6b7280;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            .search-container {
-                width: 100%;
-            }
-            .main-wrapper {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #3a3a3a;
-                display: flex;
-                overflow-x: auto;
-                padding: 0.5rem;
-            }
-            .nav-item {
-                white-space: nowrap;
-            }
-            .thumbnail {
-                width: 100%;
-            }
-            .video-info {
-                flex-direction: column;
-            }
-            .download-buttons {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo"><span>YT</span><span>IMP4</span></div>
-            <div class="search-container">
-                <input type="text" id="urlInput" class="search-input" placeholder="Paste YouTube URL...">
-                <button id="fetchBtn" class="search-button">Fetch</button>
-            </div>
-            <div class="action-group">
-                <button id="authBtn" class="action-btn"><span class="nav-icon">%REFRESH_ICON%</span>Scan Browsers</button>
-                <button id="clearCookiesBtn" class="action-btn"><span class="nav-icon">%TRASH_ICON%</span>Clear Cookies</button>
-            </div>
-        </div>
-    </div>
-    <div class="main-wrapper">
-        <div class="sidebar">
-            <div class="nav-item active" data-page="downloader"><span class="nav-icon">%DOWNLOADER_ICON%</span><span>Downloader</span></div>
-            <div class="nav-item" data-page="channel"><span class="nav-icon">%CHANNEL_ICON%</span><span>Channel Lookup</span></div>
-            <div class="nav-item" data-page="instructions"><span class="nav-icon">%INSTRUCTIONS_ICON%</span><span>Instructions</span></div>
-        </div>
-        <div class="content-area">
-            <div id="downloaderPage" class="downloader-page">
-                <div class="status-card">
-                    <div class="status-text" id="statusText">Ready</div>
-                </div>
-                <div id="resultCard" class="result-card">
-                    <div class="video-info">
-                        <div class="thumbnail-container"><img id="thumbnail" class="thumbnail"><div id="liveBadge" class="live-badge" style="display: none;">LIVE</div></div>
-                        <div class="details">
-                            <div class="video-title" id="title"></div>
-                            <div class="video-meta" id="meta"></div>
-                            <div class="actions">
-                                <div class="download-buttons">
-                                    <button id="downloadMp4Btn" class="download-btn mp4">Download MP4</button>
-                                    <button id="downloadMp3Btn" class="download-btn mp3">Download MP3</button>
-                                </div>
-                                <div id="progressContainer" class="progress-container">
-                                    <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-                                    <div id="progressText" class="progress-text">0%</div>
-                                    <div id="progressSpeed" class="progress-speed"></div>
-                                    <div id="progressEta" class="eta-text"></div>
-                                </div>
-                            </div>
-                            <div class="features">
-                                <span>Age-restricted videos</span>
-                                <span>Live streams</span>
-                                <span>Best quality merged</span>
-                                <span>MP3 with thumbnail</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="errorMsg" class="error-message"></div>
-            </div>
-            <div id="channelPage" class="channel-page">
-                <div class="status-card">
-                    <div class="status-text">Channel Lookup & Archive Tool</div>
-                </div>
-                <div class="channel-input-group">
-                    <input type="text" id="channelInput" class="channel-input" placeholder="Enter YouTube channel name, handle, or URL..." autocomplete="off">
-                    <button id="channelLookupBtn" class="channel-btn">Lookup Channel</button>
-                    <button id="archiveChannelBtn" class="action-btn"><span class="nav-icon">%ARCHIVE_ICON%</span>Archive Channel</button>
-                </div>
-                <div id="channelResults" class="channel-result"></div>
-                <div id="archiveStatus" style="margin-top: 0.5rem; font-size: 0.8rem; color: #6b7280;"></div>
-            </div>
-            <div id="instructionsPage" class="instructions-page">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <div class="step-title">Channel Lookup</div>
-                        <div class="step-desc">Search for YouTube channels by name, handle, or URL</div>
-                    </div>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <div class="step-title">View Community Posts</div>
-                        <div class="step-desc">Extract and display recent community posts from the channel</div>
-                    </div>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <div class="step-title">Archive Channel</div>
-                        <div class="step-desc">Save channel HTML data and community posts to local archive</div>
-                    </div>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <div class="step-title">Download Videos</div>
-                        <div class="step-desc">Paste any YouTube URL to download MP4 or MP3</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div id="loadingText" class="loading-text">Processing...</div></div>
-    <script>
-        const urlInput = document.getElementById('urlInput');
-        const fetchBtn = document.getElementById('fetchBtn');
-        const authBtn = document.getElementById('authBtn');
-        const clearCookiesBtn = document.getElementById('clearCookiesBtn');
-        const resultCard = document.getElementById('resultCard');
-        const titleEl = document.getElementById('title');
-        const thumbnailEl = document.getElementById('thumbnail');
-        const metaEl = document.getElementById('meta');
-        const liveBadge = document.getElementById('liveBadge');
-        const downloadMp4Btn = document.getElementById('downloadMp4Btn');
-        const downloadMp3Btn = document.getElementById('downloadMp3Btn');
-        const errorDiv = document.getElementById('errorMsg');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const loadingText = document.getElementById('loadingText');
-        const statusText = document.getElementById('statusText');
-        const downloaderPage = document.getElementById('downloaderPage');
-        const instructionsPage = document.getElementById('instructionsPage');
-        const channelPage = document.getElementById('channelPage');
-        const navItems = document.querySelectorAll('.nav-item');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const progressSpeed = document.getElementById('progressSpeed');
-        const progressEta = document.getElementById('progressEta');
-        const channelInput = document.getElementById('channelInput');
-        const channelLookupBtn = document.getElementById('channelLookupBtn');
-        const archiveChannelBtn = document.getElementById('archiveChannelBtn');
-        const channelResults = document.getElementById('channelResults');
-        const archiveStatus = document.getElementById('archiveStatus');
-        let currentVideoId = null;
-        let progressInterval = null;
-        let currentDownloadId = null;
-
-        function switchPage(page) {
-            if (page === 'downloader') {
-                downloaderPage.style.display = 'block';
-                instructionsPage.style.display = 'none';
-                channelPage.style.display = 'none';
-            } else if (page === 'channel') {
-                downloaderPage.style.display = 'none';
-                instructionsPage.style.display = 'none';
-                channelPage.style.display = 'block';
-            } else {
-                downloaderPage.style.display = 'none';
-                instructionsPage.style.display = 'block';
-                channelPage.style.display = 'none';
-            }
-            navItems.forEach(item => {
-                if (item.dataset.page === page) item.classList.add('active');
-                else item.classList.remove('active');
-            });
-        }
-
-        navItems.forEach(item => {
-            item.addEventListener('click', () => switchPage(item.dataset.page));
-        });
-
-        async function updateStatus() {
-            try {
-                const res = await fetch('/api/status');
-                const data = await res.json();
-                if (data.authenticated) {
-                    statusText.textContent = 'Authenticated';
-                } else {
-                    statusText.textContent = 'Ready';
-                }
-            } catch(e) {}
-        }
-
-        async function scanBrowsers() {
-            authBtn.disabled = true;
-            loadingOverlay.style.display = 'flex';
-            loadingText.textContent = 'Scanning browsers...';
-            statusText.textContent = 'Scanning...';
-            try {
-                const res = await fetch('/api/scan', { method: 'POST' });
-                const data = await res.json();
-                await updateStatus();
-                if (data.success) {
-                    statusText.textContent = 'Authenticated';
-                } else {
-                    statusText.textContent = 'No cookies found';
-                }
-            } catch(e) {
-                statusText.textContent = 'Error: ' + e.message;
-            } finally {
-                authBtn.disabled = false;
-                loadingOverlay.style.display = 'none';
-            }
-        }
-
-        async function clearCookies() {
-            clearCookiesBtn.disabled = true;
-            loadingOverlay.style.display = 'flex';
-            loadingText.textContent = 'Clearing cookies...';
-            statusText.textContent = 'Clearing...';
-            try {
-                const res = await fetch('/api/clear_cookies', { method: 'POST' });
-                const data = await res.json();
-                await updateStatus();
-                if (data.success) {
-                    statusText.textContent = 'Cookies cleared';
-                    resultCard.style.display = 'none';
-                } else {
-                    statusText.textContent = 'Failed to clear cookies';
-                }
-            } catch(e) {} finally {
-                clearCookiesBtn.disabled = false;
-                loadingOverlay.style.display = 'none';
-            }
-        }
-
-        authBtn.onclick = scanBrowsers;
-        clearCookiesBtn.onclick = clearCookies;
-        setInterval(updateStatus, 2000);
-        updateStatus();
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        async function channelLookup() {
-            const query = channelInput.value.trim();
-            if (!query) {
-                channelResults.innerHTML = '<div class="error-message" style="display:block;">Please enter a channel name, handle, or URL</div>';
-                return;
-            }
-            loadingOverlay.style.display = 'flex';
-            loadingText.textContent = 'Searching for channel...';
-            channelResults.innerHTML = '';
-            archiveStatus.innerHTML = '';
-            try {
-                const res = await fetch('/api/channel_lookup?q=' + encodeURIComponent(query));
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-                if (data.items && data.items.length > 0) {
-                    let html = '';
-                    for (const item of data.items) {
-                        html += `
-                            <div class="channel-card">
-                                <div class="channel-name">${escapeHtml(item.name) || 'Unknown'}</div>
-                                <div class="channel-handle">${escapeHtml(item.handle) || ''}</div>
-                                <div class="channel-stats">
-                                    <span>Subscribers: ${item.subscribers || 'N/A'}</span>
-                                    <span>Videos: ${item.videos || 'N/A'}</span>
-                                    <span>Views: ${item.views || 'N/A'}</span>
-                                </div>
-                                <div class="channel-stats">
-                                    <span>Channel ID: ${item.id || 'N/A'}</span>
-                                </div>
-                                <div style="margin-top: 0.5rem;">
-                                    <a href="${item.url || '#'}" target="_blank" style="color: #4a6a8a; text-decoration: none;">Open Channel on YouTube</a>
-                                </div>
-                            </div>
-                        `;
-                        if (item.community_posts && item.community_posts.length > 0) {
-                            html += `<div style="margin-top: 1rem;"><strong>Recent Community Posts</strong></div>`;
-                            for (const post of item.community_posts) {
-                                html += `
-                                    <div class="community-post">
-                                        <div class="post-text">${escapeHtml(post.text || '')}</div>
-                                        <div class="post-date">${post.date || ''}</div>
-                                        <div class="post-stats">
-                                            <span>Likes: ${post.likes || '0'}</span>
-                                            <span>Comments: ${post.comments || '0'}</span>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        }
-                    }
-                    channelResults.innerHTML = html;
-                } else {
-                    channelResults.innerHTML = '<div class="error-message" style="display:block;">No channels found. Try a different search term.</div>';
-                }
-            } catch (err) {
-                channelResults.innerHTML = '<div class="error-message" style="display:block;">Error: ' + err.message + '</div>';
-            } finally {
-                loadingOverlay.style.display = 'none';
-            }
-        }
-
-        async function archiveChannel() {
-            const query = channelInput.value.trim();
-            if (!query) {
-                archiveStatus.innerHTML = '<span style="color: #ff4444;">Please enter a channel URL first</span>';
-                return;
-            }
-            loadingOverlay.style.display = 'flex';
-            loadingText.textContent = 'Archiving channel data...';
-            archiveStatus.innerHTML = '';
-            try {
-                const res = await fetch('/api/archive_channel?url=' + encodeURIComponent(query));
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-                archiveStatus.innerHTML = '<span style="color: #10b981;">Archive saved: ' + data.filename + '</span>';
-            } catch (err) {
-                archiveStatus.innerHTML = '<span style="color: #ff4444;">Error: ' + err.message + '</span>';
-            } finally {
-                loadingOverlay.style.display = 'none';
-            }
-        }
-
-        channelLookupBtn.onclick = channelLookup;
-        archiveChannelBtn.onclick = archiveChannel;
-        channelInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') channelLookup();
-        });
-
-        function extractVideoId(url) {
-            const patterns = [
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-                /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
-                /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
-            ];
-            for (let p of patterns) {
-                const m = url.match(p);
-                if (m) return m[1];
-            }
-            return null;
-        }
-
-        function showError(msg) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-            setTimeout(() => errorDiv.style.display = 'none', 5000);
-        }
-
-        function startProgressMonitoring(downloadId) {
-            if (progressInterval) clearInterval(progressInterval);
-            progressContainer.style.display = 'block';
-            progressInterval = setInterval(async () => {
-                try {
-                    const res = await fetch('/api/progress/' + downloadId);
-                    const data = await res.json();
-                    if (data.percent !== undefined) {
-                        progressFill.style.width = data.percent + '%';
-                        progressText.textContent = Math.round(data.percent) + '%';
-                        if (data.speed) progressSpeed.textContent = 'Speed: ' + data.speed;
-                        if (data.eta) progressEta.textContent = 'ETA: ' + data.eta;
-                    }
-                    if (data.completed) {
-                        clearInterval(progressInterval);
-                        setTimeout(async () => {
-                            progressContainer.style.display = 'none';
-                            progressFill.style.width = '0%';
-                            progressSpeed.textContent = '';
-                            progressEta.textContent = '';
-                            const fileRes = await fetch('/api/get_file/' + downloadId);
-                            if (fileRes.ok) {
-                                const blob = await fileRes.blob();
-                                const a = document.createElement('a');
-                                const url = URL.createObjectURL(blob);
-                                a.href = url;
-                                a.download = 'YTIMP4_' + currentVideoId + '.' + (currentDownloadType === 'mp3' ? 'mp3' : 'mp4');
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
-                            } else {
-                                showError('Failed to retrieve downloaded file');
-                            }
-                        }, 500);
-                    }
-                } catch(e) {}
-            }, 250);
-        }
-
-        let currentDownloadType = 'mp4';
-
-        fetchBtn.onclick = async () => {
-            const url = urlInput.value.trim();
-            if (!url) {
-                showError('Enter a YouTube URL');
-                return;
-            }
-            currentVideoId = extractVideoId(url);
-            if (!currentVideoId) {
-                showError('Invalid YouTube URL');
-                return;
-            }
-            loadingOverlay.style.display = 'flex';
-            loadingText.textContent = 'Fetching video...';
-            resultCard.style.display = 'none';
-            statusText.textContent = 'Fetching...';
-            try {
-                const res = await fetch('/api/info?url=' + encodeURIComponent(url));
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-                thumbnailEl.src = data.thumbnail;
-                titleEl.textContent = data.title;
-                liveBadge.style.display = data.isLive ? 'block' : 'none';
-                metaEl.textContent = (data.isLive ? 'LIVE | ' : '') + data.uploader;
-                resultCard.style.display = 'block';
-                statusText.textContent = 'Ready';
-            } catch (err) {
-                showError(err.message);
-            } finally {
-                loadingOverlay.style.display = 'none';
-            }
-        };
-
-        downloadMp4Btn.onclick = () => {
-            if (!currentVideoId) {
-                showError('Fetch a video first');
-                return;
-            }
-            currentDownloadId = Date.now().toString();
-            currentDownloadType = 'mp4';
-            startProgressMonitoring(currentDownloadId);
-            fetch('/api/download?video_id=' + currentVideoId + '&type=mp4&download_id=' + currentDownloadId).catch(e => showError(e.message));
-        };
-
-        downloadMp3Btn.onclick = () => {
-            if (!currentVideoId) {
-                showError('Fetch a video first');
-                return;
-            }
-            currentDownloadId = Date.now().toString();
-            currentDownloadType = 'mp3';
-            startProgressMonitoring(currentDownloadId);
-            fetch('/api/download?video_id=' + currentVideoId + '&type=mp3&download_id=' + currentDownloadId).catch(e => showError(e.message));
-        };
-
-        urlInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') fetchBtn.click();
-        });
-    </script>
-</body>
-</html>"""
-
 @app.route('/')
 def index():
-    html = HTML
-    html = html.replace('%DOWNLOADER_ICON%', ICON_DOWNLOADER)
-    html = html.replace('%INSTRUCTIONS_ICON%', ICON_INSTRUCTIONS)
-    html = html.replace('%REFRESH_ICON%', ICON_REFRESH)
-    html = html.replace('%TRASH_ICON%', ICON_TRASH)
-    html = html.replace('%CHANNEL_ICON%', ICON_CHANNEL)
-    html = html.replace('%ARCHIVE_ICON%', ICON_ARCHIVE)
-    return render_template_string(html)
+    return render_template('index.htm')
 
 @app.route('/api/channel_lookup')
 def channel_lookup():
@@ -1367,6 +381,79 @@ def channel_lookup():
     except Exception as e:
         logger.error(f"Channel lookup error: {e}")
         return jsonify({'error': str(e)})
+
+@app.route('/api/channel_lookup_html')
+def channel_lookup_html():
+    return '''
+    <div class="status-card">
+        <div class="status-text">Channel Lookup & Archive Tool</div>
+    </div>
+    <div class="channel-input-group">
+        <input type="text" id="channelInput" class="channel-input" placeholder="Enter YouTube channel name, handle, or URL..." autocomplete="off">
+        <button id="channelLookupBtn" class="channel-btn">Lookup Channel</button>
+        <button id="archiveChannelBtn" class="action-btn"><span class="nav-icon"><img src="/static/icons/archive.svg" alt="archive" onerror="this.src='/static/fallback.png'"></span>Archive Channel</button>
+    </div>
+    <div id="channelResults" class="channel-result"></div>
+    <div id="archiveStatus" style="margin-top: 0.5rem; font-size: 0.8rem; color: #6b7280;"></div>
+    <script>
+        document.getElementById('channelLookupBtn').onclick = async function() {
+            const query = document.getElementById('channelInput').value.trim();
+            if (!query) { alert('Please enter a channel name or URL'); return; }
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = 'Searching...';
+            try {
+                const res = await fetch('/api/channel_lookup?q=' + encodeURIComponent(query));
+                const data = await res.json();
+                const container = document.getElementById('channelResults');
+                if (data.error) { container.innerHTML = '<div class="error-message" style="display:block;">' + data.error + '</div>'; return; }
+                if (!data.items || data.items.length === 0) { container.innerHTML = '<div class="loading-suggestion">No channels found</div>'; return; }
+                let html = '';
+                for (const item of data.items) {
+                    html += '<div class="channel-card">';
+                    html += '<div class="channel-name">' + (item.name || 'Unknown') + '</div>';
+                    html += '<div class="channel-handle">' + (item.handle || '') + '</div>';
+                    html += '<div class="channel-stats">';
+                    html += '<span>Subscribers: ' + (item.subscribers || 'N/A') + '</span>';
+                    html += '<span>Videos: ' + (item.videos || 'N/A') + '</span>';
+                    html += '<span>Views: ' + (item.views || 'N/A') + '</span>';
+                    html += '</div>';
+                    html += '<div style="margin-top:0.5rem;"><a href="' + (item.url || '#') + '" target="_blank" style="color:#4a6a8a;">Open Channel</a></div>';
+                    if (item.community_posts && item.community_posts.length > 0) {
+                        html += '<div style="margin-top:1rem;"><strong>Recent Community Posts</strong></div>';
+                        for (const post of item.community_posts) {
+                            html += '<div class="community-post">';
+                            html += '<div class="post-text">' + (post.text || '') + '</div>';
+                            html += '<div class="post-date">' + (post.date || '') + '</div>';
+                            html += '<div class="post-stats"><span>Likes: ' + (post.likes || '0') + '</span><span>Comments: ' + (post.comments || '0') + '</span></div>';
+                            html += '</div>';
+                        }
+                    }
+                    html += '</div>';
+                }
+                container.innerHTML = html;
+            } catch(e) {
+                document.getElementById('channelResults').innerHTML = '<div class="error-message" style="display:block;">Error: ' + e.message + '</div>';
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+        document.getElementById('archiveChannelBtn').onclick = async function() {
+            const query = document.getElementById('channelInput').value.trim();
+            if (!query) { alert('Please enter a channel URL'); return; }
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = 'Archiving...';
+            try {
+                const res = await fetch('/api/archive_channel?url=' + encodeURIComponent(query));
+                const data = await res.json();
+                const status = document.getElementById('archiveStatus');
+                if (data.error) { status.innerHTML = '<span style="color:#ff4444;">Error: ' + data.error + '</span>'; }
+                else { status.innerHTML = '<span style="color:#10b981;">Archive saved: ' + data.filename + '</span>'; }
+            } catch(e) {
+                document.getElementById('archiveStatus').innerHTML = '<span style="color:#ff4444;">Error: ' + e.message + '</span>';
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+    </script>
+    '''
 
 @app.route('/api/archive_channel')
 def archive_channel():
@@ -1492,6 +579,7 @@ def download():
     video_id = request.args.get('video_id', '')
     dtype = request.args.get('type', 'mp4')
     download_id = request.args.get('download_id', '')
+    quality = request.args.get('quality', 'best')
 
     if not video_id or not download_id:
         return 'Missing parameters', 400
@@ -1518,6 +606,72 @@ def download():
     thread.start()
 
     return '', 202
+
+@app.route('/api/subtitles')
+def get_subtitles():
+    video_id = request.args.get('video_id', '')
+    if not video_id:
+        return jsonify({'error': 'No video ID'})
+    
+    if not os.path.exists(COOKIE_FILE):
+        return jsonify({'error': 'No cookies'})
+    
+    try:
+        cmd = [sys.executable, "-m", "yt_dlp", "--cookies", COOKIE_FILE, "--write-subs", "--sub-lang", "en", "--skip-download", "-o", f"{video_id}", f"https://www.youtube.com/watch?v={video_id}"]
+        subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        
+        sub_file = f"{video_id}.en.srt"
+        if os.path.exists(sub_file):
+            with open(sub_file, 'r', encoding='utf-8') as f:
+                subs = f.read()
+            os.remove(sub_file)
+            return jsonify({'subtitles': subs})
+        return jsonify({'error': 'No subtitles found'})
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/api/queue_status')
+def queue_status():
+    active = 0
+    queued = 0
+    for d in download_progress.values():
+        if d.get('completed', False) == False:
+            active += 1
+        elif d.get('queued', False):
+            queued += 1
+    return jsonify({'active': active, 'queued': queued})
+
+@app.route('/api/system_status')
+def system_status():
+    try:
+        total, used, free = shutil.disk_usage(os.path.dirname(__file__))
+        return jsonify({'free_space': f'{free // (1024**3)} GB'})
+    except:
+        return jsonify({'free_space': 'N/A'})
+
+@app.route('/api/get_settings')
+def get_settings():
+    settings = {
+        'youtube_api_key': os.environ.get('YT_API_KEY', ''),
+        'download_folder': DOWNLOAD_FOLDER,
+        'max_concurrent_downloads': 3,
+        'default_format': 'mp4',
+        'default_quality': 'best',
+        'max_retries': 3,
+        'save_subtitles': False,
+        'subtitle_language': 'en'
+    }
+    return jsonify(settings)
+
+@app.route('/api/save_settings', methods=['POST'])
+def save_settings():
+    try:
+        data = request.json
+        with open('settings.json', 'w') as f:
+            json.dump(data, f)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
     if os.path.exists(COOKIE_FILE):
