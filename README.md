@@ -3,11 +3,13 @@
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 
-**YouTube Downloader** — download YouTube videos, audio, live streams, and subtitles.
+YTIMP4 is a Python application for downloading YouTube videos, audio, live streams, playlists, channels, and subtitles. It uses `yt-dlp` as its download backend and provides a simple interface for managing downloads.
 
 ---
 
 ## Installation
+
+Clone the repository and install the required packages:
 
 ```bash
 git clone https://github.com/nixisaka/YTIMP4.git
@@ -15,21 +17,23 @@ cd YTIMP4
 pip install -r requirements.txt
 ```
 
-Alternatively, download the latest release from the GitHub Releases page.
-
 ---
 
 ## Running
 
 ### Windows
 
-Double-click `start.bat` or run:
+Run:
 
 ```bash
 python bootstrap.py
 ```
 
+or start the application using `start.bat`.
+
 ### Linux / macOS
+
+Run:
 
 ```bash
 python3 ytimp4.py
@@ -39,12 +43,12 @@ python3 ytimp4.py
 
 ## Features
 
-- MP4 video downloads (1080p+ where available)
-- MP3 audio extraction with embedded thumbnails
-- SRT subtitle downloads
-- Live stream and archive downloads
-- Channel downloads
-- Batch downloads with queue support
+- Download videos in MP4 format
+- Extract audio as MP3
+- Download subtitles in SRT format
+- Download live streams and archived streams
+- Download playlists and channels
+- Queue multiple downloads
 - Automatic subtitle retrieval
 - Browser cookie detection
 - Download history
@@ -54,7 +58,7 @@ python3 ytimp4.py
 
 ## Dependencies
 
-YTIMP4 depends on the following Python packages:
+YTIMP4 requires the following Python packages:
 
 - Flask
 - yt-dlp
@@ -64,19 +68,28 @@ YTIMP4 depends on the following Python packages:
 - colorama
 - google-api-python-client
 
-Install them with:
+Install or update them with:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-If dependency installation fails on Windows, run `start.bat`. It will attempt to create a virtual environment, install the required packages, and start the application automatically.
+On Windows, `start.bat` can automatically create a virtual environment, install missing dependencies, and start the application.
+
+---
+
+## Additional Information
+
+- YTIMP4 uses `yt-dlp` for downloading media from YouTube.
+- Some videos may require browser cookies or authentication.
+- Download quality depends on the formats provided by YouTube.
+- Updating `yt-dlp` regularly is recommended to maintain compatibility with YouTube.
 
 ---
 
 ## License
 
-MIT License
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 Copyright © 2026 nixisaka
 
