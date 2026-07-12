@@ -345,7 +345,7 @@ async def search_channels_async(query):
 
 @app.route('/')
 def index():
-    return render_template('index.htm')
+    return render_template('index.html')
 
 @app.route('/api/channel_lookup')
 def channel_lookup():

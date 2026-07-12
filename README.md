@@ -96,3 +96,4 @@ Copyright © 2026 nixisaka
 ### Contributors
 
 - FILipKOS
+- Lexxenaii
