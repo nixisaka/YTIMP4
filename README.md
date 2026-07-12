@@ -1,9 +1,11 @@
-# YTIMP4
+# YTIMP4 - BP
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 
 YTIMP4 is a Python application for downloading YouTube videos, audio, live streams, playlists, channels, and subtitles. It uses `yt-dlp` as its download backend and provides a simple interface for managing downloads.
+
+BP branch is a YTIMP4 branch created where certain fixes or new functions will be tested on it before being published to everyone. Note that this branch shouldn't be used as a replacement.
 
 ---
 
