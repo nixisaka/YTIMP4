@@ -355,10 +355,8 @@ def channel_lookup():
 
     try:
         if query.startswith('http'):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            connector = aiohttp.TCPConnector(limit=1)
             async def fetch_single():
+                connector = aiohttp.TCPConnector(limit=1) # FKOS: moved the async function to prevent loop errors
                 async with aiohttp.ClientSession(connector=connector) as session:
                     html_content = await fetch_channel_html_async(session, query)
                     if html_content:
@@ -369,14 +367,11 @@ def channel_lookup():
                             channel_info['url'] = query
                             return [channel_info]
                     return []
-            items = loop.run_until_complete(fetch_single())
-            loop.close()
+            
+            items = asyncio.run(fetch_single()) # FKOS: syncio.run() is affective for managing loop executions
             return jsonify({'items': items})
         else:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            results = loop.run_until_complete(search_channels_async(query))
-            loop.close()
+            results = asyncio.run(search_channels_async(query))
             return jsonify({'items': results})
     except Exception as e:
         logger.error(f"Channel lookup error: {e}")
@@ -393,54 +388,72 @@ def channel_lookup_html():
         <button id="channelLookupBtn" class="channel-btn">Lookup Channel</button>
         <button id="archiveChannelBtn" class="action-btn"><span class="nav-icon"><img src="/static/icons/archive.svg" alt="archive" onerror="this.src='/static/fallback.png'"></span>Archive Channel</button>
     </div>
+    
+    <div id="loadingOverlay" style="display: none; padding: 10px 0; color: #4a6a8a; font-weight: bold;">
+        <span id="loadingText">Searching...</span>
+    </div>
+
     <div id="channelResults" class="channel-result"></div>
     <div id="archiveStatus" style="margin-top: 0.5rem; font-size: 0.8rem; color: #6b7280;"></div>
     <script>
         document.getElementById('channelLookupBtn').onclick = async function() {
             const query = document.getElementById('channelInput').value.trim();
             if (!query) { alert('Please enter a channel name or URL'); return; }
+            
             document.getElementById('loadingOverlay').style.display = 'flex';
             document.getElementById('loadingText').textContent = 'Searching...';
+            document.getElementById('channelResults').innerHTML = ''; // Clear previous
+            
             try {
                 const res = await fetch('/api/channel_lookup?q=' + encodeURIComponent(query));
                 const data = await res.json();
                 const container = document.getElementById('channelResults');
-                if (data.error) { container.innerHTML = '<div class="error-message" style="display:block;">' + data.error + '</div>'; return; }
-                if (!data.items || data.items.length === 0) { container.innerHTML = '<div class="loading-suggestion">No channels found</div>'; return; }
-                let html = '';
-                for (const item of data.items) {
-                    html += '<div class="channel-card">';
-                    html += '<div class="channel-name">' + (item.name || 'Unknown') + '</div>';
-                    html += '<div class="channel-handle">' + (item.handle || '') + '</div>';
-                    html += '<div class="channel-stats">';
-                    html += '<span>Subscribers: ' + (item.subscribers || 'N/A') + '</span>';
-                    html += '<span>Videos: ' + (item.videos || 'N/A') + '</span>';
-                    html += '<span>Views: ' + (item.views || 'N/A') + '</span>';
-                    html += '</div>';
-                    html += '<div style="margin-top:0.5rem;"><a href="' + (item.url || '#') + '" target="_blank" style="color:#4a6a8a;">Open Channel</a></div>';
-                    if (item.community_posts && item.community_posts.length > 0) {
-                        html += '<div style="margin-top:1rem;"><strong>Recent Community Posts</strong></div>';
-                        for (const post of item.community_posts) {
-                            html += '<div class="community-post">';
-                            html += '<div class="post-text">' + (post.text || '') + '</div>';
-                            html += '<div class="post-date">' + (post.date || '') + '</div>';
-                            html += '<div class="post-stats"><span>Likes: ' + (post.likes || '0') + '</span><span>Comments: ' + (post.comments || '0') + '</span></div>';
-                            html += '</div>';
-                        }
-                    }
-                    html += '</div>';
+                
+                if (data.error) { 
+                    container.innerHTML = '<div class="error-message" style="display:block; color:red;">' + data.error + '</div>'; 
                 }
-                container.innerHTML = html;
+                else if (!data.items || data.items.length === 0) { 
+                    container.innerHTML = '<div class="loading-suggestion">No channels found</div>'; 
+                }
+                else {
+                    let html = '';
+                    for (const item of data.items) {
+                        html += '<div class="channel-card" style="border:1px solid #ccc; padding:10px; margin-top:10px;">';
+                        html += '<div class="channel-name"><strong>' + (item.name || 'Unknown') + '</strong></div>';
+                        html += '<div class="channel-handle">' + (item.handle || '') + '</div>';
+                        html += '<div class="channel-stats">';
+                        html += '<span style="margin-right:10px;">Subscribers: ' + (item.subscribers || 'N/A') + '</span>';
+                        html += '<span style="margin-right:10px;">Videos: ' + (item.videos || 'N/A') + '</span>';
+                        html += '<span>Views: ' + (item.views || 'N/A') + '</span>';
+                        html += '</div>';
+                        html += '<div style="margin-top:0.5rem;"><a href="' + (item.url || '#') + '" target="_blank" style="color:#4a6a8a;">Open Channel</a></div>';
+                        if (item.community_posts && item.community_posts.length > 0) {
+                            html += '<div style="margin-top:1rem;"><strong>Recent Community Posts</strong></div>';
+                            for (const post of item.community_posts) {
+                                html += '<div class="community-post" style="background:#f9f9f9; padding:5px; margin-top:5px; font-size:0.9em;">';
+                                html += '<div class="post-text">' + (post.text || '') + '</div>';
+                                html += '<div class="post-date" style="color:#888;">' + (post.date || '') + '</div>';
+                                html += '<div class="post-stats"><span>Likes: ' + (post.likes || '0') + '</span> | <span>Comments: ' + (post.comments || '0') + '</span></div>';
+                                html += '</div>';
+                            }
+                        }
+                        html += '</div>';
+                    }
+                    container.innerHTML = html;
+                }
             } catch(e) {
-                document.getElementById('channelResults').innerHTML = '<div class="error-message" style="display:block;">Error: ' + e.message + '</div>';
+                document.getElementById('channelResults').innerHTML = '<div class="error-message" style="display:block; color:red;">Error: ' + e.message + '</div>';
             }
             document.getElementById('loadingOverlay').style.display = 'none';
         };
+
         document.getElementById('archiveChannelBtn').onclick = async function() {
             const query = document.getElementById('channelInput').value.trim();
             if (!query) { alert('Please enter a channel URL'); return; }
+            
             document.getElementById('loadingOverlay').style.display = 'flex';
             document.getElementById('loadingText').textContent = 'Archiving...';
+            
             try {
                 const res = await fetch('/api/archive_channel?url=' + encodeURIComponent(query));
                 const data = await res.json();
@@ -465,11 +478,8 @@ def archive_channel():
         if not channel_url.startswith('http'):
             channel_url = f"https://www.youtube.com/{channel_url}"
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        connector = aiohttp.TCPConnector(limit=1)
-
-        async def fetch_and_archive():
+        async def fetch_and_archive(): # FKOS: moved the async function inside
+            connector = aiohttp.TCPConnector(limit=1)
             async with aiohttp.ClientSession(connector=connector) as session:
                 html_content = await fetch_channel_html_async(session, channel_url)
                 if not html_content:
@@ -500,8 +510,7 @@ def archive_channel():
 
                 return filename
 
-        filename = loop.run_until_complete(fetch_and_archive())
-        loop.close()
+        filename = asyncio.run(fetch_and_archive()) # FKOS: use asyncio.run()
 
         if filename:
             return jsonify({'success': True, 'filename': filename})
@@ -674,9 +683,9 @@ def save_settings():
         return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
-    if os.path.exists(COOKIE_FILE):
-        os.remove(COOKIE_FILE)
     print(f"\nYTIMP4 - CPU cores: {cpu_count}, Deno: {check_deno()}, FFmpeg: {check_ffmpeg()}")
     print(f"Archive folder: {ARCHIVE_FOLDER}")
     port = 8080
     app.run(host='127.0.0.1', port=port, debug=False, threaded=True)
+    # FKOS: i removed os.remove(COOKIE_FILE) check, preventing them from being wiped on server restart
+    # although not sure if we want to keep this change.
