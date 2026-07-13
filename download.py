@@ -14,7 +14,6 @@ import urllib.request
 import zipfile
 from pathlib import Path
 from flask import Flask, render_template_string, request, send_file, jsonify
-import requests
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
