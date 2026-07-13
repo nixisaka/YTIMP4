@@ -44,7 +44,7 @@ def load_config():
         with open(CONFIG_FILE, 'r') as f:
             return json.load(f)
     return {
-        "youtube_api_key": "AIzaSyBXTPfHXAiof-IlskrPVWarp2j37TAKdW0",
+        "youtube_api_key": "",
         "download_queue": [],
         "settings": {
             "max_concurrent_downloads": 3,
@@ -60,7 +60,7 @@ def save_config(config):
         json.dump(config, f, indent=2)
 
 config = load_config()
-YOUTUBE_API_KEY = config.get("youtube_api_key", "AIzaSyBXTPfHXAiof-IlskrPVWarp2j37TAKdW0")
+YOUTUBE_API_KEY = config.get("youtube_api_key", "")
 download_queue = config.get("download_queue", [])
 max_concurrent = config.get("settings", {}).get("max_concurrent_downloads", 3)
 
